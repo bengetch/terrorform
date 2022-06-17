@@ -26,9 +26,9 @@ from terrorform import *
 This library supports `init`, `apply`, and `destroy` workflows:
 
 ```python
-from terrorform import terrorform
+from terrorform import *
 
-# Run full setup/teardown worfklow with target directory equal to current working directory
+# Run full setup/teardown workflow with target directory equal to current working directory
 init_resp = terrorform.init()
 apply_resp = terrorform.apply()
 destroy_resp = terrorform.destroy()

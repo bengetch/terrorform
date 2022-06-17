@@ -1,4 +1,5 @@
 import json
+import sys
 import subprocess
 
 
@@ -50,6 +51,9 @@ class terrorform:
     AUTO_APPROVE = True
     # Prevent terraform from placing state locking on .tfstate files.
     LOCK = False
+    # Terraform does not expose any option to suppress output, so this flag is used
+    # in the subprocess.run() command in the cmd() function below
+    SILENT = False
 
     @staticmethod
     def _cmd(workflow: str, kw_args: dict, boolean_flags: list, var_args: dict):
@@ -75,7 +79,8 @@ class terrorform:
             _cmd,
             encoding="UTF-8",
             shell=True,
-            check=True
+            check=True,
+            stdout=subprocess.DEVNULL if terrorform.SILENT else sys.stdout
         )
 
     @staticmethod
