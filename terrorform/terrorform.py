@@ -3,14 +3,26 @@ import sys
 import subprocess
 
 
-# non-global options for terraform need to be placed *after* the workflow keyword
-# when using the CLI, while global options are placed *before* the workflow keyword
-# TODO: this list is not exhaustive, but Terraform documentation doesn't appear to
-#  provide a centralized global parameter list. Will need to look into it more.
-NON_GLOBAL_KW_OPTIONS = [
-    "-input", "-lock", "-lock-timeout", "-refresh", "-replace", "-target",
-    "-var", "-var-file", "-parallelism", "-state", "-state-out", "-backup"
-]
+TERRORFORM_OPTIONS = {
+    # non-global options for terraform need to be placed *after* the workflow keyword
+    # when using the CLI, while global options are placed *before* the workflow keyword
+    # TODO: this list is not exhaustive, but Terraform documentation doesn't appear to
+    #  provide a centralized global parameter list. Will need to look into it more.
+    "NON_GLOBAL_KW_OPTIONS": [
+        "-input", "-lock", "-lock-timeout", "-refresh", "-replace", "-target",
+        "-var", "-var-file", "-parallelism", "-state", "-state-out", "-backup"
+    ],
+    # Suppress user prompts for approval at runtime for apply and destroy workflows.
+    # Overriding this flag is not recommended, as the prompt itself will not actually
+    # display at runtime, and the program will hang for an indefinite period of time
+    # before crashing.
+    "AUTO_APPROVE": True,
+    # Prevent terraform from placing state locking on .tfstate files.
+    "LOCK": False,
+    # Terraform does not expose any option to suppress output, so this flag is used
+    # in the subprocess.run() command in the cmd() function below
+    "SILENT": False
+}
 
 
 class arg(tuple):
@@ -44,16 +56,6 @@ class terrorform:
     """
     Wrapper for terraform CLI
     """
-    # Suppress user prompts for approval at runtime for apply and destroy workflows.
-    # Overriding this flag is not recommended, as the prompt itself will not actually
-    # display at runtime, and the program will hang for an indefinite period of time
-    # before crashing.
-    AUTO_APPROVE = True
-    # Prevent terraform from placing state locking on .tfstate files.
-    LOCK = False
-    # Terraform does not expose any option to suppress output, so this flag is used
-    # in the subprocess.run() command in the cmd() function below
-    SILENT = False
 
     @staticmethod
     def _cmd(workflow: str, kw_args: dict, boolean_flags: list, var_args: dict):
@@ -61,8 +63,14 @@ class terrorform:
         Construct a terraform CLI command.
         """
 
-        global_args = [str(arg(t)) for t in kw_args.items() if t[0] not in NON_GLOBAL_KW_OPTIONS]
-        non_global_args = [str(arg(t)) for t in kw_args.items() if t[0] in NON_GLOBAL_KW_OPTIONS]
+        global_args = [
+            str(arg(t)) for t in kw_args.items()
+            if t[0] not in TERRORFORM_OPTIONS.get("NON_GLOBAL_KW_OPTIONS", [])
+        ]
+        non_global_args = [
+            str(arg(t)) for t in kw_args.items()
+            if t[0] in TERRORFORM_OPTIONS.get("NON_GLOBAL_KW_OPTIONS", [])
+        ]
         custom_vars = [str(var(t)) for t in var_args.items()]
 
         return " ".join(
@@ -80,7 +88,7 @@ class terrorform:
             encoding="UTF-8",
             shell=True,
             check=True,
-            stdout=subprocess.DEVNULL if terrorform.SILENT else sys.stdout
+            stdout=subprocess.DEVNULL if TERRORFORM_OPTIONS.get("SILENT", True) else sys.stdout
         )
 
     @staticmethod
@@ -111,9 +119,9 @@ class terrorform:
         """
 
         if kw_args is None:
-            return {"-lock": terrorform.LOCK}
+            return {"-lock": TERRORFORM_OPTIONS.get("LOCK", False)}
         else:
-            return {**kw_args, "-lock": terrorform.LOCK} \
+            return {**kw_args, "-lock": TERRORFORM_OPTIONS.get("LOCK", False)} \
                 if "-lock" not in kw_args \
                 else kw_args
 
@@ -125,10 +133,10 @@ class terrorform:
         """
 
         if boolean_flags is None:
-            return ["-auto-approve"] if terrorform.AUTO_APPROVE else []
+            return ["-auto-approve"] if TERRORFORM_OPTIONS.get("AUTO_APPROVE", True) else []
         else:
             return boolean_flags + ["-auto-approve"] \
-                if terrorform.AUTO_APPROVE and "-auto-approve" not in boolean_flags \
+                if TERRORFORM_OPTIONS.get("AUTO_APPROVE", True) and "-auto-approve" not in boolean_flags \
                 else boolean_flags
 
     @staticmethod

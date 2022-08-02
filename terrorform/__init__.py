@@ -1,1 +1,1 @@
-from terrorform.terrorform import terrorform, init, apply, destroy
+from terrorform.terrorform import terrorform, init, apply, destroy, TERRORFORM_OPTIONS
