@@ -7,7 +7,7 @@ import pytest
     params=[
         {
             "workflow": [terrorform.init, init],
-            "kw_args": {},
+            "kw_args": [],
             "boolean_flags": [],
             "vars_dict": {},
             "expected": "terraform init"
@@ -21,7 +21,7 @@ import pytest
         },
         {
             "workflow": [terrorform.init, init],
-            "kw_args": {"-chdir": "/tmp/terraform/"},
+            "kw_args": [("-chdir", "/tmp/terraform/")],
             "boolean_flags": ["-no-color"],
             "vars_dict": {"deployment-name": "test-deployment", "important_dict": {"var": 8}},
             "expected": "terraform -chdir=\"/tmp/terraform/\" init "
@@ -30,7 +30,7 @@ import pytest
         },
         {
             "workflow": [terrorform.apply, apply],
-            "kw_args": {},
+            "kw_args": [],
             "boolean_flags": [],
             "vars_dict": {},
             "expected": "terraform apply -lock=false -auto-approve"
@@ -44,14 +44,14 @@ import pytest
         },
         {
             "workflow": [terrorform.apply, apply],
-            "kw_args": {"-lock": True},
+            "kw_args": [("-lock", True)],
             "boolean_flags": [],
             "vars_dict": {"num_instances": 8},
             "expected": "terraform apply -lock=true -auto-approve -var='num_instances=8'"
         },
         {
             "workflow": [terrorform.destroy, destroy],
-            "kw_args": {},
+            "kw_args": [],
             "boolean_flags": [],
             "vars_dict": {},
             "expected": "terraform destroy -lock=false -auto-approve"
@@ -65,7 +65,7 @@ import pytest
         },
         {
             "workflow": [terrorform.destroy, destroy],
-            "kw_args": {"-chdir": "/tmp/terrorform/"},
+            "kw_args": [("-chdir", "/tmp/terrorform/")],
             "boolean_flags": ["-json"],
             "vars_dict": {"region": "us-east-1"},
             "expected": "terraform -chdir=\"/tmp/terrorform/\" destroy "

@@ -58,17 +58,17 @@ class terrorform:
     """
 
     @staticmethod
-    def _cmd(workflow: str, kw_args: dict, boolean_flags: list, var_args: dict):
+    def _cmd(workflow: str, kw_args: list, boolean_flags: list, var_args: dict):
         """
         Construct a terraform CLI command.
         """
 
         global_args = [
-            str(arg(t)) for t in kw_args.items()
+            str(arg(t)) for t in kw_args
             if t[0] not in TERRORFORM_OPTIONS.get("NON_GLOBAL_KW_OPTIONS", [])
         ]
         non_global_args = [
-            str(arg(t)) for t in kw_args.items()
+            str(arg(t)) for t in kw_args
             if t[0] in TERRORFORM_OPTIONS.get("NON_GLOBAL_KW_OPTIONS", [])
         ]
         custom_vars = [str(var(t)) for t in var_args.items()]
@@ -92,7 +92,7 @@ class terrorform:
         )
 
     @staticmethod
-    def _init(kw_args: dict = None, boolean_flags: list = None, vars_dict: dict = None):
+    def _init(kw_args: list = None, boolean_flags: list = None, vars_dict: dict = None):
         """
         Construct CLI command for init workflow.
         """
@@ -104,7 +104,7 @@ class terrorform:
         )
 
     @staticmethod
-    def init(kw_args: dict = None, boolean_flags: list = None, vars_dict: dict = None, dry: bool = False):
+    def init(kw_args: list = None, boolean_flags: list = None, vars_dict: dict = None, dry: bool = False):
         """
         Run terraform init workflow.
         """
@@ -112,18 +112,17 @@ class terrorform:
         return _cmd if dry else terrorform.cmd(_cmd)
 
     @staticmethod
-    def _configure_default_kw_args(kw_args: dict = None):
+    def _configure_default_kw_args(kw_args: list = None):
         """
         Ensure keyword arguments dict for apply and destroy workflows
         contains key(s) that this library requires to function properly.
         """
 
         if kw_args is None:
-            return {"-lock": TERRORFORM_OPTIONS.get("LOCK", False)}
+            return [("-lock", TERRORFORM_OPTIONS.get("LOCK", False))]
         else:
-            return {**kw_args, "-lock": TERRORFORM_OPTIONS.get("LOCK", False)} \
-                if "-lock" not in kw_args \
-                else kw_args
+            return kw_args + [("-lock", TERRORFORM_OPTIONS.get("LOCK", False))] \
+                if '-lock' not in set(t[0] for t in kw_args) else kw_args
 
     @staticmethod
     def _configure_default_boolean_flags(boolean_flags: list = None):
@@ -140,7 +139,7 @@ class terrorform:
                 else boolean_flags
 
     @staticmethod
-    def _apply(kw_args: dict = None, boolean_flags: list = None, vars_dict: dict = None):
+    def _apply(kw_args: list = None, boolean_flags: list = None, vars_dict: dict = None):
         """
         Construct CLI command for apply workflow
         """
@@ -152,7 +151,7 @@ class terrorform:
         )
 
     @staticmethod
-    def apply(kw_args: dict = None, boolean_flags: list = None, vars_dict: dict = None, dry: bool = False):
+    def apply(kw_args: list = None, boolean_flags: list = None, vars_dict: dict = None, dry: bool = False):
         """
         Run terraform apply workflow.
         """
@@ -161,7 +160,7 @@ class terrorform:
         return _cmd if dry else terrorform.cmd(_cmd)
 
     @staticmethod
-    def _destroy(kw_args: dict = None, boolean_flags: list = None, vars_dict: dict = None):
+    def _destroy(kw_args: list = None, boolean_flags: list = None, vars_dict: dict = None):
         """
         Construct CLI command for destroy workflow
         """
@@ -173,7 +172,7 @@ class terrorform:
         )
 
     @staticmethod
-    def destroy(kw_args: dict = None, boolean_flags: list = None, vars_dict: dict = None, dry: bool = False):
+    def destroy(kw_args: list = None, boolean_flags: list = None, vars_dict: dict = None, dry: bool = False):
         """
         Run terraform destroy workflow.
         """
