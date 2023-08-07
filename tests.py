@@ -71,6 +71,13 @@ import pytest
             "expected": "terraform -chdir=\"/tmp/terrorform/\" destroy "
                         "-lock=false -json -auto-approve -var='region=us-east-1'"
         },
+        {
+            "workflow": [terrorform.apply, apply],
+            "kw_args": [("-backend", False)],
+            "boolean_flags": [],
+            "vars_dict": {"region": "us-east-2"},
+            "expected": "terraform apply -backend=false -lock=false -auto-approve -var='region=us-east-2'"
+        }
     ]
 )
 def get_workflow_inputs(request):

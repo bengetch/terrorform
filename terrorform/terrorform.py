@@ -10,7 +10,8 @@ TERRORFORM_OPTIONS = {
     #  provide a centralized global parameter list. Will need to look into it more.
     "NON_GLOBAL_KW_OPTIONS": [
         "-input", "-lock", "-lock-timeout", "-refresh", "-replace", "-target",
-        "-var", "-var-file", "-parallelism", "-state", "-state-out", "-backup"
+        "-var", "-var-file", "-parallelism", "-state", "-state-out", "-backup",
+        "-backend"
     ],
     # Suppress user prompts for approval at runtime for apply and destroy workflows.
     # Overriding this flag is not recommended, as the prompt itself will not actually
